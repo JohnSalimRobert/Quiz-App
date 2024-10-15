@@ -9,6 +9,7 @@ import Footer from "../QuizFooter/Footer";
 import QuestionBlockMemo from "../QuestionBlock/QuestionBlock";
 import TransitionsModal from "../Modal/Modal";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import QuizStepper from "../Stepper/Stepper";
 
 const shuffledQuestions = shuffleOptions(networkQuestions);
 
@@ -30,6 +31,9 @@ const Quiz = () => {
   const handleStart = () => {
     setStart(!start);
     handleNext();
+  };
+  const handleRestart = () => {
+    window.location.reload();
   };
   const handleNext = () => {
     if (next === 6) return;
@@ -60,18 +64,26 @@ const Quiz = () => {
       }, 1000);
     }
   };
-
+  console.log(score)
   const handleNextQuestion = () => {
     if (next === 5) {
       setStart(false);
-      setNext(-1);
-      setScore(0);
+      if(score >4){
+        setQuestion({
+          question: "Congratulations! You scored " + score + " out of 6.",
+          options: [],
+          hint: "Play again?",
+        });
+      }else{
+        setQuestion({
+          question: "Sorry, you scored " + score + " out of 6.",
+          options: [],
+          hint: "Play again?",
+        });
+      }
+      // setNext(-1);
+      // setScore(0);
       setResponse("");
-      setQuestion({
-        question: "Quiz completed! Thanks for playing.",
-        options: [],
-        hint: "Play again?",
-      });
     } else {
       setResponse("");
       setQuestion(shuffledQuestions[next + 1]);
@@ -85,6 +97,7 @@ const Quiz = () => {
       height={"95vh"}
       justifyContent={"center"}
     >
+      {next > -1 &&  <QuizStepper currentQuestion={next}/>}
       <Tooltip title={question.hint} placement="top-end">
         <Stack
           direction={"row"}
@@ -102,9 +115,10 @@ const Quiz = () => {
           disableButton={disableButton}
           options={question.options}
           handleSelect={handleSelect}
+          score={score}
         />
         {start && <Buttons handleNext={handleNext} buttonText={"next"} />}
-        {!start && <Buttons handleNext={handleStart} buttonText={"Start"} />}
+        {!start && <Buttons handleNext={next === 6 ? handleRestart : handleStart} buttonText={next === 6 ? "Restart" : "Start"} />}
       </Stack>
       {start && (
         <Footer
